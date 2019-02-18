@@ -80,9 +80,9 @@ def check_is_rtcp(sorce_port, dest_port):
     return False
 
 def analyze_voip(pcap):
-    sorce_port = ''
-    dest_port = ''
     for line in pcap:
+        sorce_port = ''
+        dest_port = ''
         #take line and decode it to buffer
         if check_is_sip(line):
             #read and understand the sip message
