@@ -35,7 +35,6 @@ class sdpDescription(object):
 
 
 def is_register_request():
-    #chcke for the local user address will need that later
     pass
 
 def is_invite():
@@ -67,8 +66,10 @@ def is_local_rtp(line):
     pass
 
 def check_is_sip(line):
-    #check in the hreaders if you have "SIP/2.0" string
-    pass
+    if "SIP/2.0" in line.payload:
+        print line
+        return True
+    return False
 
 def check_is_rtp(sorce_port, dest_port):
     #check if the ports are rtp ports
@@ -79,7 +80,8 @@ def check_is_rtcp(sorce_port, dest_port):
     return False
 
 def analyze_voip(pcap):
-
+    sorce_port = ''
+    dest_port = ''
     for line in pcap:
         #take line and decode it to buffer
         if check_is_sip(line):
@@ -98,7 +100,7 @@ def analyze_voip(pcap):
                 #the call is ended
                 break
 
-        elif check_is_rtp(_sorce_port_, _dest_port_):
+        elif check_is_rtp(sorce_port, dest_port):
             #read and understand the rtp message, and wtite it to file
             if check_rtp_valid(line):
                 if is_local_rtp(line):
@@ -107,7 +109,7 @@ def analyze_voip(pcap):
                 else:
                     #write the raw data as wave to remote file
                     pass
-        elif check_is_rtcp(_sorce_port_, _dest_port_):
+        elif check_is_rtcp(sorce_port, dest_port):
             #do nothing for now (will use rtcp in exercise 2)
             pass
         else:
@@ -117,13 +119,13 @@ def analyze_voip(pcap):
     print 'done!!!'
         
 def main(argv):
-   inputfile = ''
-   try:
-      opts, args = getopt.getopt(argv,"hi:o:")
-   except getopt.GetoptError:
-      print 'exercise_1.py -i <inputfile>'
-      sys.exit()
-   for opt, arg in opts:
+    inputfile = ''
+    try:
+        opts, args = getopt.getopt(argv,"hi:o:")
+    except getopt.GetoptError:
+        print 'exercise_1.py -i <inputfile>'
+        sys.exit()
+    for opt, arg in opts:
         if opt == '-h':
             print 'exercise_1.py -i <inputFile> -o <outputPath>'
             sys.exit()
@@ -134,9 +136,8 @@ def main(argv):
         else:
             print 'exercise_1.py -i <inputfile>'
             sys.exit()
-
-    pcap = PcapReader(inputfile)
-    analyze_voip(pcap)
+    packets = rdpcap(inputfile)
+    analyze_voip(packets)
 
 if __name__ == "__main__":
    main(sys.argv[1:])
